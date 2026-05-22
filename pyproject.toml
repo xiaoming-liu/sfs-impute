@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sfs_imputation"
+version = "1.2.2"
+description = "Convex-optimization SFS imputer for VCF allele-count data with missing genotypes"
+requires-python = ">=3.12"
+authors = [{name = "Xiaoming Liu", email = "xiaomingliu@usf.edu"}]
+license = "MIT"
+license-files = ["LICENSE"]
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=2.0",
+    "scipy>=1.13",
+]
+
+[project.optional-dependencies]
+validate = ["msprime>=1.3"]
+
+[project.scripts]
+sfs-impute = "sfs_imputation.cli:main"
+vcf-to-sfs = "sfs_imputation.vcf_to_sfs:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
