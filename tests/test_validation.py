@@ -41,8 +41,8 @@ class TestInstall(unittest.TestCase):
     """The package imports, reports the expected version, and registers
     its console-script entry points."""
 
-    def test_version_is_1_2_2(self) -> None:
-        self.assertEqual(sfs_imputation.__version__, "1.2.2")
+    def test_version_is_1_2_3(self) -> None:
+        self.assertEqual(sfs_imputation.__version__, "1.2.3")
 
     def test_console_scripts_registered(self) -> None:
         try:

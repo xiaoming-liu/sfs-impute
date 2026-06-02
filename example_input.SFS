@@ -1,7 +1,7 @@
 Data
 Input_data: ASJ
 Data_format: SFS
-Known ancestral alleles: true
+Alleles polarized: true
 Include_deletion/gap_as_another_type_of_nucleotide_allele: false
 Total sequence length (L): 7.35864277E8
 Total number of sequences (full sample size): 3472

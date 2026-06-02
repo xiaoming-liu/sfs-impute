@@ -50,11 +50,13 @@ def _parse_header(lines: List[str]):
         if line == "[":
             data_start = i + 1
             break
-        # Current header: "Known ancestral alleles: true/false"
-        # Legacy header: "Has_an_ancestral/outgroup_sequence: true/false"
-        # Both encode the same semantic: true = ancestral known => unfolded;
-        # false = ancestral unknown => folded.
-        if "Known ancestral alleles" in line or "Has_an_ancestral/outgroup_sequence" in line:
+        # Current header: "Alleles polarized: true/false"
+        # Legacy headers: "Known ancestral alleles: ...",
+        #                 "Has_an_ancestral/outgroup_sequence: ..."
+        # All encode the same semantic: true = polarized / ancestral known => unfolded;
+        # false = unpolarized / ancestral unknown => folded.
+        if ("Alleles polarized" in line or "Known ancestral alleles" in line
+                or "Has_an_ancestral/outgroup_sequence" in line):
             folded = "false" in line.lower()
         elif "Total sequence leng" in line:  # matches "length" and legacy "lengh" typo
             try:
@@ -68,8 +70,8 @@ def _parse_header(lines: List[str]):
                 pass
     if folded is None:
         raise ValueError(
-            "Header missing 'Known ancestral alleles' line "
-            "(or legacy 'Has_an_ancestral/outgroup_sequence')"
+            "Header missing 'Alleles polarized' line "
+            "(or legacy 'Known ancestral alleles' / 'Has_an_ancestral/outgroup_sequence')"
         )
     return N, folded, L_total, data_start
 

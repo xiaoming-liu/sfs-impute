@@ -23,7 +23,11 @@ def _build_parser() -> argparse.ArgumentParser:
                         help="Total sequence length L (required when --hasmono=false)")
     parser.add_argument("--hasmono", choices=["auto", "true", "false"], default="auto")
     parser.add_argument("--folded", choices=["auto", "true", "false"], default="auto")
-    parser.add_argument("--solver", choices=["em", "cvxpy"], default="em")
+    parser.add_argument("--solver", choices=["em", "plain-em", "cvxpy"], default="em",
+                        help="Solver: 'em' (SQUAREM-accelerated, default), "
+                             "'plain-em' (unaccelerated Vardi EM, recommended "
+                             "for small samples N<200), or 'cvxpy' (convex "
+                             "optimisation, requires CVXPY)")
     parser.add_argument("--tol", type=float, default=1e-10)
     parser.add_argument("--tol-loglik", type=float, default=1e-9,
                         help="Convergence tolerance on per-iter delta_loglik / L (default 1e-9)")
@@ -87,7 +91,9 @@ def main(argv: Optional[List[str]] = None) -> int:
             final_delta = 0.0
             final_ll = float("nan")
         else:
-            res = solver_em.solve(
+            solver_fn = (solver_em.solve_plain_em if args.solver == "plain-em"
+                         else solver_em.solve)
+            res = solver_fn(
                 A, c, tol=args.tol, tol_loglik=args.tol_loglik,
                 max_iter=args.max_iter, verbose=args.verbose,
             )

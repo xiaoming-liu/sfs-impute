@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sfs_imputation"
-version = "1.2.2"
+version = "1.2.3"
 description = "Convex-optimization SFS imputer for VCF allele-count data with missing genotypes"
 requires-python = ">=3.12"
 authors = [{name = "Xiaoming Liu", email = "xiaomingliu@usf.edu"}]

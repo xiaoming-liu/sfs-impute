@@ -17,7 +17,7 @@ identical on both platforms; only the activation command differs.
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
-pip install dist/sfs_imputation-1.2.2-py3-none-any.whl
+pip install dist/sfs_imputation-1.2.3-py3-none-any.whl
 ```
 
 **Windows (PowerShell):**
@@ -25,7 +25,7 @@ pip install dist/sfs_imputation-1.2.2-py3-none-any.whl
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
-pip install dist/sfs_imputation-1.2.2-py3-none-any.whl
+pip install dist/sfs_imputation-1.2.3-py3-none-any.whl
 ```
 
 (The wheel is in the `dist/` subfolder of this distribution; adjust the path if running from elsewhere.)
@@ -47,6 +47,12 @@ Produces `example_input.SFS.imputed` next to the input. The command takes
 unique configs). `--verbose` prints convergence info (iterations,
 delta, final log-likelihood) to stderr.
 
+For ecological-scale samples (N < 200), the plain EM solver is recommended:
+
+```bash
+sfs-impute --solver plain-em --verbose example_input.SFS
+```
+
 Multiple files in one invocation:
 
 ```bash
@@ -67,7 +73,10 @@ Common flags:
                               "About --total-length" below.
 --project-to N_STAR           also write <input>.imputed.proj_<N_STAR>
                               (down-projected SFS for tools like dadi/moments)
---solver {em,cvxpy}           default em (production); cvxpy for small-N validation
+--solver {em,plain-em,cvxpy}   em = SQUAREM-accelerated (default, best for N>=5000);
+                              plain-em = unaccelerated Vardi EM (recommended for
+                              ecological samples N<200, avoids MLE overfitting);
+                              cvxpy = convex optimisation (validation only)
 --verbose                     print convergence info to stderr
 ```
 
@@ -114,7 +123,7 @@ a small header followed by 4-column rows `m  count  n1  n2`:
 Data
 Input_data: <pop name>
 Data_format: SFS
-Known ancestral alleles: true       # true = unfolded, false = folded
+Alleles polarized: true       # true = unfolded (polarized), false = folded
 Total sequence length (L): 7.35864277E8
 Total number of sequences (full sample size): 3472
 [
@@ -192,7 +201,7 @@ information you paid to determine.
 ## Reproducing the install
 
 ```bash
-python -c "import sfs_imputation; print(sfs_imputation.__version__)"  # prints 1.2.2
+python -c "import sfs_imputation; print(sfs_imputation.__version__)"  # prints 1.2.3
 sfs-impute --verbose example_input.SFS  # ~30-60s; produces example_input.SFS.imputed
 head example_input.SFS.imputed  # first rows are highest-frequency derived classes
 ```
@@ -258,11 +267,17 @@ Watterson's theta and pi. Exits 0 on PASS, 1 on FAIL.
 ```python
 from sfs_imputation.io import read_sfs_file, write_imputed
 from sfs_imputation.kernel import build_kernel
-from sfs_imputation.solver_em import solve
+from sfs_imputation.solver_em import solve, solve_plain_em
 
 cfg = read_sfs_file("input.SFS")
 A, c, K = build_kernel(cfg.configs, N=cfg.N, folded=cfg.folded)
+
+# For large samples (N >= 5000): SQUAREM-accelerated EM (default)
 res = solve(A, c)
+
+# For ecological samples (N < 200): plain EM (recommended)
+res = solve_plain_em(A, c)
+
 write_imputed(res.p, L=float(c.sum()), folded=cfg.folded, N=cfg.N,
               out_path="input.SFS.imputed")
 ```

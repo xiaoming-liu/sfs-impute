@@ -156,7 +156,7 @@ def write_sfs_file(
         out.write("Data\n")
         out.write(f"Input_data: {pop}\n")
         out.write("Data_format: SFS\n")
-        out.write(f"Known ancestral alleles: {'false' if folded else 'true'}\n")
+        out.write(f"Alleles polarized: {'false' if folded else 'true'}\n")
         out.write(f"Total sequence length (L): {total_length}\n")
         out.write(f"Total number of sequences (full sample size): {total_an}\n")
         out.write("[\n")
